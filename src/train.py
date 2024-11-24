@@ -54,6 +54,7 @@ def train(args):
     random.seed(seed)
     torch.manual_seed(seed)
     np.random.seed(seed)
+
     if args.device == 'mps':
         torch.mps.manual_seed(seed)
         torch.backends.mps.deterministic=True
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default="50", help="Number of training epochs")
     parser.add_argument("--output_dir", type=str, default="./outputs", help="Directory to save checkpoints")
     parser.add_argument("--phase", type=str, default="2", help="1: Pretrain, 2: Finetune")
-    parser.add_argument("--device", type=str, default="mps")    
+    parser.add_argument("--device", type=str, default="cuda")    
     args = parser.parse_args()
 
     train(args)
