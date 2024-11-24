@@ -1,6 +1,8 @@
 import os
+import random
 import argparse
 import datetime
+import numpy as np
 from tqdm import tqdm
 import torch
 import torch.nn as nn
@@ -48,8 +50,21 @@ def train_one_epoch(model, loader, optimizer, criterion, device):
     return running_loss / len(loader), 100. * correct / total
 
 def train(args):
-    args.output_dir = os.path.join(args.output_dir,\
-        f"{args.model}_{args.phase}_lr{args.lr}_B{args.batch_size}_E{args.epochs}_{datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}")
+    seed = 42
+    random.seed(seed)
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    if args.device == 'mps':
+        torch.mps.manual_seed(seed)
+        torch.backends.mps.deterministic=True
+        torch.backends.mps.benchmark = False
+    elif args.device == 'cuda':
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic=True
+        torch.backends.cudnn.benchmark = False
+
+    args.output_dir = os.path.join(args.output_dir,f"{args.model}_{args.phase}_{datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}")
     model_path = os.path.join(args.output_dir, f"model.pth")
     log_path = os.path.join(args.output_dir, f"logs.log")
     if not os.path.exists(args.output_dir):
@@ -57,27 +72,30 @@ def train(args):
 
     model = get_model(args.model, pretrained=args.phase=="2").to(args.device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr) if args.phase == "2" else \
-        optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1, betas=(0.9, 0.999))
+    optimizer = optim.Adam(model.parameters(), lr=args.lr) \
+        if args.phase == "2" \
+        else optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1, betas=(0.9, 0.999))
     lr_scheduler=LinearDecayLR(optimizer, int(args.epochs), int(int(args.epochs)*0.25))
-    train_loader, test_loader = get_CIFAR_loaders(args.batch_size, args.batch_size) if args.phase == "2" else \
-        get_ImageNet1K_loaders(args.batch_size, args.batch_size)
+
+    train_loader, test_loader = get_CIFAR_loaders(args.batch_size, args.batch_size) \
+        if args.phase == "2" \
+        else get_ImageNet1K_loaders(args.batch_size, args.batch_size)
     
-    logger = Logger(log_path)
-    logger(f"Model: {args.model}, Phase: {args.phase}")
-    logger(f"Batch Size: {args.batch_size}, Learning Rate: {args.lr}, Epochs: {args.epochs}")
-    logger(f"Output Directory: {args.output_dir}")
-    logger(f"Device: {args.device}")
-    logger("=================================")
+    train_logger = Logger(log_path)
+    train_logger(f"Model: {args.model}, Phase: {args.phase}")
+    train_logger(f"Batch Size: {args.batch_size}, Learning Rate: {args.lr}, Epochs: {args.epochs}")
+    train_logger(f"Output Directory: {args.output_dir}")
+    train_logger(f"Device: {args.device}")
+    train_logger("=========================================")
 
     for epoch in range(int(args.epochs)):
-        logger(f"\nEpoch [{epoch+1}/{args.epochs}]")
+        train_logger(f"\nEpoch [{epoch+1}/{args.epochs}]")
         train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, criterion, device=args.device)
         val_loss, val_acc = validation(model, test_loader, criterion, device=args.device)
 
-        logger(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
-        logger(f"Valid Loss: {val_loss:.4f} | Valid Acc: {val_acc:.2f}%")
-        logger(f"Learning Rate: {lr_scheduler.get_lr()}")
+        train_logger(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
+        train_logger(f"Valid Loss: {val_loss:.4f} | Valid Acc: {val_acc:.2f}%")
+        train_logger(f"Learning Rate: {lr_scheduler.get_lr()}")
         lr_scheduler.step()
 
     torch.save(model.state_dict(), model_path)
