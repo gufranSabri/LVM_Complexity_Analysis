@@ -2,6 +2,20 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 import timm
 
+def get_model_name(model_name):
+    if model_name == "vit":
+        model_name = "vit_base_patch16_224"
+    elif model_name == "deit":
+        model_name = "deit_base_patch16_224"
+    elif model_name == "swin":
+        model_name = "swin_base_patch4_window7_224"
+    elif model_name == "resnet":
+        model_name = "resnet50"
+    else:
+        raise ValueError("Invalid model name")
+
+    return model_name
+
 def get_model(model_name, pretrained=True, num_classes=100):
     if model_name == "vit":
         model = timm.create_model("vit_base_patch16_224", pretrained=True, num_classes=num_classes)
