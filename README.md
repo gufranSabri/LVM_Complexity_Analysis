@@ -59,3 +59,39 @@ python train.py --model vit --batch_size 128 --lr 0.001 --epochs 50 --phase 2 --
 --output_dir - Directory where model checkpoints and logs will be saved.
 --phase      - 1 for pretraining, 2 for fine-tuning.
 --device     - Specify cuda for GPU or cpu for CPU.
+
+
+<hr>
+
+# Model Visualizer
+
+The **Model Visualizer** is a Flask-based web application that allows you to visualize the architecture of large vision models (ViT, DeiT, Swin, ResNet) and inspect their layer sizes and parameters interactively.
+
+## Running the Model Visualizer
+
+To run the model visualizer, follow these steps:
+
+1. **Start the Flask server:**
+   Navigate to the directory where the `model_viz.py` file is located and run the following command:
+
+```
+python model_viz.py
+```
+
+2. The server will start, and you can access the model visualizer in your web browser at `http://127.0.0.1:5000/`.
+
+## Visualizing a Model
+
+- Once the Flask server is running, you can choose between supported models (ViT, DeiT, Swin, ResNet) and view their architectures layer by layer.
+- The visualizer will display the model architecture along with detailed information about the input size after each layer.
+- You can interact with the architecture, collapse/expand layers, and view the model's computation and memory requirements in real-time.
+
+## Screenshot
+
+Here is a screenshot of the Model Visualizer interface:
+
+![Model Visualizer Screenshot](./fig/model_viz.png)
+
+This image provides a preview of what you will see once the Flask server is running and you've loaded the model of your choice.
+
+<hr>

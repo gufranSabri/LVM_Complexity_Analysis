@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Visualizer</title>
+
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(255, 224, 224);
+        }
+
+        #model details {
+            margin-left: 20px;
+        }
+
+        #loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Model Visualizer</a>
+            </div>
+        </nav>
+        <div class="container-fluid d-flex flex-row p-5 justify-content-evenly">
+            <div class="col-5" id="model_card">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <label for="model-select" class="form-label text me-2">Select Model:</label>
+                            <select id="model-select" class="form-select form-select-sm d-inline-block w-auto">
+                                <option value="">None</option>
+                                <option value="vit">ViT</option>
+                                <option value="deit">DeiT</option>
+                                <option value="swin">Swin</option>
+                                <option value="resnet">ResNet</option>
+                            </select>
+                        </div>
+                        <button id="collapse-all" class="btn btn-sm btn-danger">Collapse All</button>
+                    </div>
+                    <div id="model_div" class="card-body">
+                        <div id="loader_div" style="display: none;">
+                            <p style="text-align: center;">Fetching Model...</p>
+                            <div id="loader">
+                            </div>
+                        </div>
+                        <div id="model"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-5" id="data_flow_card">
+                <div class="card">
+                    <div class="card-header">Data Flow</div>
+                    <div id="data_flow" class="card-body"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        socket.on("model_response", (data) => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            const model = data.model;
+            const lines = model.split("\n");
+            const tree = parseModel(lines);
+            renderModelTree(tree);
+        });
+
+        socket.on("layer_size", (data) => {
+            const layerName = data.layer;
+            const size = data.size;
+            console.log(`Input size after ${layerName}: ${size}`);
+
+            const sizeDiv = document.getElementById("data_flow");
+            let table = sizeDiv.querySelector("table");
+
+            if (!table) {
+                table = document.createElement("table");
+                table.classList.add("table", "table-bordered", "table-striped");
+
+                const thead = document.createElement("thead");
+                const tr = document.createElement("tr");
+
+                const thLayer = document.createElement("th");
+                thLayer.textContent = "Layer Name";
+                const thSize = document.createElement("th");
+                thSize.textContent = "Tensor Size";
+
+                tr.appendChild(thLayer);
+                tr.appendChild(thSize);
+                thead.appendChild(tr);
+                table.appendChild(thead);
+
+                const tbody = document.createElement("tbody");
+                table.appendChild(tbody);
+                sizeDiv.appendChild(table);
+            }
+
+            const tbody = table.querySelector("tbody");
+            const tr = document.createElement("tr");
+
+            const tdLayer = document.createElement("td");
+            tdLayer.textContent = layerName;
+
+            const tdSize = document.createElement("td");
+            tdSize.textContent = size;
+
+            tr.appendChild(tdLayer);
+            tr.appendChild(tdSize);
+            tbody.appendChild(tr);
+        });
+
+        function parseModel(lines) {
+            let model_name = lines[0].replace("(", "").trim();
+            let model_tree = {};
+            model_tree[model_name] = {};
+            let layer_stack = [model_tree[model_name]];
+
+            for (let i = 1; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (line[line.length - 1] === ")" && line.length === 1) {
+                    layer_stack.pop();
+                    continue;
+                }
+
+                let layer_name = line.split(":")[0];
+                let depth = Object.keys(layer_stack[layer_stack.length - 1]).length;
+                let key = layer_name;
+                layer_stack[layer_stack.length - 1][key] = {};
+                if (line[line.length - 1] === "(") {
+                    layer_stack.push(layer_stack[layer_stack.length - 1][key]);
+                } else {
+                    layer_stack[layer_stack.length - 1][key] = { layer: line.split(":")[1].trim() };
+                }
+            }
+            return model_tree;
+        }
+
+        function renderModelTree(tree) {
+            $("#loader_div").hide();
+            $("#model-select").prop("disabled", false);
+
+            const modelDiv = document.getElementById("model");
+            modelDiv.innerHTML = "";
+
+            function createDetails(node, name) {
+                const details = document.createElement("details");
+                const summary = document.createElement("summary");
+                summary.textContent = name;
+                details.appendChild(summary);
+
+                for (let key in node) {
+                    if (typeof node[key] === "object") {
+                        details.appendChild(createDetails(node[key], key));
+                    } else {
+                        const span = document.createElement("span");
+                        span.textContent = `${key}: ${node[key]}`;
+                        span.style.marginLeft = "20px";
+                        details.appendChild(span);
+                    }
+                }
+                return details;
+            }
+
+            for (let key in tree) {
+                modelDiv.appendChild(createDetails(tree[key], key));
+            }
+        }
+
+
+        setInterval(()=>{
+            var pageWidth = $(window).width()
+            var screenLessThan1130 = pageWidth<=1130
+
+            if(screenLessThan1130){
+                $("#data_flow_card").hide()
+                $("#model_card").removeClass("col-5").addClass("col-7")
+            }
+            else{
+                $("#data_flow_card").show()
+                $("#model_card").removeClass("col-7").addClass("col-5")
+            }
+        }, 500)
+
+        document.getElementById("collapse-all").addEventListener("click", () => {
+            const detailsElements = document.querySelectorAll("#model details");
+            detailsElements.forEach(details => {
+                details.open = false;
+            });
+        });
+
+        document.getElementById("model-select").addEventListener("change", (event) => {
+            const selectedModel = event.target.value;
+            $("#model").html("");
+            $("#data_flow").html("");
+            
+            if(selectedModel === "") return;
+            $("#model-select").prop("disabled", true);
+            $("#loader_div").show();
+            socket.emit("request_model", { model: selectedModel });
+        });
+    </script>
+</body>
+</html>
