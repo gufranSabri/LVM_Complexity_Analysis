@@ -44,12 +44,12 @@ cd <repository_directory>
 ## Run Analysis
 
 ```
-python train.py --model <model_name> --batch_size <batch_size> --lr <learning_rate> --epochs <num_epochs> --phase <1|2> --device <cuda|cpu>|<mps>
+python src/train.py --model <model_name> --batch_size <batch_size> --lr <learning_rate> --epochs <num_epochs> --phase <1|2> --device <cuda|cpu>|<mps>
 ```
 
 ```
 Example:
-python train.py --model vit --batch_size 128 --lr 0.001 --epochs 50 --phase 2 --device cuda
+python src/train.py --model vit --batch_size 128 --lr 0.001 --epochs 50 --phase 2 --device cuda
 ```
 
 --model      - Choose the model: vit, deit, swin, or resnet.
@@ -75,7 +75,7 @@ To run the model visualizer, follow these steps:
    Navigate to the directory where the `model_viz.py` file is located and run the following command:
 
 ```
-python model_viz.py
+python src/model_viz.py
 ```
 
 2. The server will start, and you can access the model visualizer in your web browser at `http://127.0.0.1:5000/`.
