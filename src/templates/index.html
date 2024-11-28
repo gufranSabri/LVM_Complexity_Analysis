@@ -152,14 +152,10 @@
                     continue;
                 }
 
-                // let layer_name = line.split(":")[0];
-
                 let count = 1
                 let layer_name = line.split(":")[1].substring(0, line.split(":")[1].indexOf("(")).trim()+" ("+count+")"
-                while(layer_stack[layer_stack.length - 1].hasOwnProperty(layer_name)){
-                    count += 1
-                    layer_name = line.split(":")[1].substring(0, line.split(":")[1].indexOf("(")).trim()+" ("+count+")"
-                }
+                while(layer_stack[layer_stack.length - 1].hasOwnProperty(layer_name))
+                    layer_name = line.split(":")[1].substring(0, line.split(":")[1].indexOf("(")).trim()+" ("+(count++)+")"
                 
                 let depth = Object.keys(layer_stack[layer_stack.length - 1]).length;
                 let key = layer_name;
