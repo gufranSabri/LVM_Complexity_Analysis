@@ -133,7 +133,7 @@ def train(args):
     complexity_stats_logger = Logger(log_path.replace("train","stats"))
     complexity_stats_logger(f"Model: {get_model_name(args.model)}")
     complexity_stats_logger(f"Dataset size: {len(train_loader.dataset)}")
-    complexity_stats_logger(f"Batch Size: {args.batch_size}")
+    complexity_stats_logger(f"FLOPs per instance: {FLOPs_per_instance(model, args.device)}")
     complexity_stats_logger(f"Average time per forward pass: {total_train_time/int(args.epochs)/len(train_loader)/int(args.batch_size)}")
     complexity_stats_logger(f"Training time per epoch: {total_train_time/int(args.epochs)}")
     complexity_stats_logger(f"Per instance inference latency: {per_instance_inference_latency}")

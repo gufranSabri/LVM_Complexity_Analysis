@@ -39,3 +39,24 @@ def measure_per_batch_gpu_memory_consumption(model, batch_size, device):
 
     assert isinstance(per_batch_gpu_memory, int), f"per_batch_gpu_memory should be an int, but got {type(per_batch_gpu_memory)}"
     return per_batch_gpu_memory
+
+def FLOPs_per_instance(model, device):
+    """
+    Calculate the number of FLOPs for the model.
+    input:
+        model: torch.nn.Module
+        device: torch.device
+
+    output:
+        flops: float
+    """
+    # Dummy input based on the model's requirements
+    dummy_input = torch.rand(1, 3, 224, 224).to(device)  # Example for an image classification model
+    model = model.to(device)
+    model.eval()
+
+    # Compute FLOPs using fvcore
+    flops_analysis = FlopCountAnalysis(model, dummy_input)
+    flops = flops_analysis.total()
+
+    return flops
