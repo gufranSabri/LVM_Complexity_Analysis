@@ -13,10 +13,23 @@ def measure_per_instance_inference_latency(model, device):
     output:
         per_token_latency: float
     """
+    dummy_input = torch.rand(1, 3, 224, 224).to(device)
+    model = model.to(device)
+    model.eval()
 
-    avg_latency = 0
+    with torch.no_grad():
+        start_time = torch.cuda.Event(enable_timing=True)
+        end_time = torch.cuda.Event(enable_timing=True)
 
-    # WRITE CODE HERE
+        start_time.record()
+        model(dummy_input)
+        end_time.record()
+
+        torch.cuda.synchronize()
+
+        avg_latency = start_time.elapsed_time(end_time)  # Latency in milliseconds
+
+    avg_latency = avg_latency
 
     assert isinstance(avg_latency, float), f"avg_latency should be a float, but got {type(avg_latency)}"
     return avg_latency
@@ -32,10 +45,20 @@ def measure_per_batch_gpu_memory_consumption(model, batch_size, device):
     output:
         per_batch_gpu_memory: int
     """
+    dummy_input = torch.rand(batch_size, 3, 224, 224).to(device)
+    model = model.to(device)
+    model.eval()
 
-    per_batch_gpu_memory = 0
+    # Reset GPU memory tracker
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats(device)
 
-    # WRITE CODE HERE
+    with torch.no_grad():
+        model(dummy_input)
+
+    # Get the peak memory usage in bytes
+    peak_memory = torch.cuda.max_memory_allocated(device)
+    per_batch_gpu_memory = int(peak_memory / (1024 ** 2))  # Convert to MB
 
     assert isinstance(per_batch_gpu_memory, int), f"per_batch_gpu_memory should be an int, but got {type(per_batch_gpu_memory)}"
     return per_batch_gpu_memory
@@ -50,8 +73,7 @@ def FLOPs_per_instance(model, device):
     output:
         flops: float
     """
-    # Dummy input based on the model's requirements
-    dummy_input = torch.rand(1, 3, 224, 224).to(device)  # Example for an image classification model
+    dummy_input = torch.rand(1, 3, 224, 224).to(device)
     model = model.to(device)
     model.eval()
 

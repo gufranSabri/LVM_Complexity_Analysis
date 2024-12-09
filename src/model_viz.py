@@ -30,6 +30,7 @@ def handle_request_model(data):
         return
     
     model = get_model(model_type)
+    print(model)
     
     for layer in model.children():
         layer.register_forward_hook(hook_fn)

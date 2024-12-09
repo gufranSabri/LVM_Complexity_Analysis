@@ -16,6 +16,11 @@ def get_model_name(model_name):
 
     return model_name
 
+print(get_model_name("vit"))
+print(get_model_name("deit"))
+print(get_model_name("swin"))
+print(get_model_name("resnet"))
+
 def get_model(model_name, pretrained=True, num_classes=100):
     if model_name == "vit":
         model = timm.create_model("vit_base_patch16_224", pretrained=True, num_classes=num_classes)
