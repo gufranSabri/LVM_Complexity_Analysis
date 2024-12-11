@@ -3,13 +3,23 @@ Dataset size: 50000
 FLOPs per instance: 16866721536
 Average time per forward pass: 0.0032319330811843546
 Training time per epoch: 161.75178684711457
-Per instance inference latency: 8.156160354614258
-Per batch GPU memory consumption (batch size 4): 1361
-Per batch GPU memory consumption (batch size 8): 1391
-Per batch GPU memory consumption (batch size 16): 1451
-Per batch GPU memory consumption (batch size 32): 1572
-Per batch GPU memory consumption (batch size 64): 1812
-Per batch GPU memory consumption (batch size 128): 2293
-Per batch GPU memory consumption (batch size 256): 3254
+Per batch inference latency (batch size 1): 70.57177734375
+Per batch inference latency (batch size 2): 8.65881633758545
+Per batch inference latency (batch size 4): 13.37887954711914
+Per batch inference latency (batch size 8): 24.253215789794922
+Per batch inference latency (batch size 16): 48.55491256713867
+Per batch inference latency (batch size 32): 96.95964813232422
+Per batch inference latency (batch size 64): 191.49282836914062
+Per batch inference latency (batch size 128): 382.85284423828125
+Per batch inference latency (batch size 256): 768.2749633789062
+Per batch GPU memory consumption (batch size 1): 343
+Per batch GPU memory consumption (batch size 2): 355
+Per batch GPU memory consumption (batch size 4): 366
+Per batch GPU memory consumption (batch size 8): 396
+Per batch GPU memory consumption (batch size 16): 456
+Per batch GPU memory consumption (batch size 32): 576
+Per batch GPU memory consumption (batch size 64): 816
+Per batch GPU memory consumption (batch size 128): 1297
+Per batch GPU memory consumption (batch size 256): 2259
 Validation Loss: 2.2999
 Validation Accuracy: 52.20%

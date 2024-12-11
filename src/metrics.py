@@ -3,17 +3,18 @@ from utils import *
 from fvcore.nn import FlopCountAnalysis
 
 
-def measure_per_instance_inference_latency(model, device):
+def measure_inference_latency_for_batch(model, batch_size, device):
     """
-    Measure the latency of the model per token.
+    Measure the latency of the model per batch.
     input:
         model: torch.nn.Module
+        batch_size: int
         device: torch.device
 
     output:
         per_token_latency: float
     """
-    dummy_input = torch.rand(1, 3, 224, 224).to(device)
+    dummy_input = torch.rand(batch_size, 3, 224, 224).to(device)
     model = model.to(device)
     model.eval()
 
@@ -27,7 +28,7 @@ def measure_per_instance_inference_latency(model, device):
 
         torch.cuda.synchronize()
 
-        avg_latency = start_time.elapsed_time(end_time)  # Latency in milliseconds
+        avg_latency = start_time.elapsed_time(end_time)
 
     avg_latency = avg_latency
 
@@ -77,7 +78,6 @@ def FLOPs_per_instance(model, device):
     model = model.to(device)
     model.eval()
 
-    # Compute FLOPs using fvcore
     flops_analysis = FlopCountAnalysis(model, dummy_input)
     flops = flops_analysis.total()
 

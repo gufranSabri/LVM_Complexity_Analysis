@@ -151,7 +151,7 @@ class Logger:
             print(message)
 
 
-y_map = get_ImageNet1K_labels()
+# y_map = get_ImageNet1K_labels()
 
 if __name__ == "__main__":
     loader  = get_ImageNet1K_loaders_train(32)
@@ -159,10 +159,3 @@ if __name__ == "__main__":
     for batch in loader:
         print(len(batch))
         X,y = batch
-
-        # print(X.shape)
-    # get_model("vit")
-    # get_model("resnet")
-    # get_model("swin")
-
-    # get_CIFAR_loaders(1, 1)

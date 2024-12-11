@@ -82,7 +82,7 @@ def train(args):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), betas=(0.9, 0.999), eps=1e-08) \
         if args.phase == "2" \
-        else None#optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1, betas=(0.9, 0.999))
+        else optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1, betas=(0.9, 0.999))
     lr_scheduler=LinearDecayLR(optimizer, int(args.epochs), int(int(args.epochs)*0.25))
     # initialize components ==================================
 
@@ -137,7 +137,18 @@ def train(args):
                 break
 
     # measure complexity metrics =============================
-    per_instance_inference_latency = measure_per_instance_inference_latency(model, args.device)
+    per_batch_latency_b1 = measure_inference_latency_for_batch(model, 1, args.device)
+    per_batch_latency_b2 = measure_inference_latency_for_batch(model, 2, args.device)
+    per_batch_latency_b4 = measure_inference_latency_for_batch(model, 4, args.device)
+    per_batch_latency_b8 = measure_inference_latency_for_batch(model, 8, args.device)
+    per_batch_latency_b16 = measure_inference_latency_for_batch(model, 16, args.device)
+    per_batch_latency_b32 = measure_inference_latency_for_batch(model, 32, args.device)
+    per_batch_latency_b64 = measure_inference_latency_for_batch(model, 64, args.device)
+    per_batch_latency_b128 = measure_inference_latency_for_batch(model, 128, args.device)
+    per_batch_latency_b256 = measure_inference_latency_for_batch(model, 256, args.device)
+
+    per_batch_gpu_memory_consumption_b1 = measure_per_batch_gpu_memory_consumption(model, 1, args.device)
+    per_batch_gpu_memory_consumption_b2 = measure_per_batch_gpu_memory_consumption(model, 2, args.device)
     per_batch_gpu_memory_consumption_b4 = measure_per_batch_gpu_memory_consumption(model, 4, args.device)
     per_batch_gpu_memory_consumption_b8 = measure_per_batch_gpu_memory_consumption(model, 8, args.device)
     per_batch_gpu_memory_consumption_b16 = measure_per_batch_gpu_memory_consumption(model, 16, args.device)
@@ -155,7 +166,19 @@ def train(args):
     complexity_stats_logger(f"FLOPs per instance: {FLOPs_per_instance(model, args.device)}")
     complexity_stats_logger(f"Average time per forward pass: {total_train_time/int(args.epochs)/len(train_loader)/int(args.batch_size)}")
     complexity_stats_logger(f"Training time per epoch: {total_train_time/int(args.epochs)}")
-    complexity_stats_logger(f"Per instance inference latency: {per_instance_inference_latency}")
+
+
+    complexity_stats_logger(f"Per batch inference latency (batch size 1): {per_batch_latency_b1}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 2): {per_batch_latency_b2}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 4): {per_batch_latency_b4}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 8): {per_batch_latency_b8}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 16): {per_batch_latency_b16}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 32): {per_batch_latency_b32}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 64): {per_batch_latency_b64}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 128): {per_batch_latency_b128}")
+    complexity_stats_logger(f"Per batch inference latency (batch size 256): {per_batch_latency_b256}")
+    complexity_stats_logger(f"Per batch GPU memory consumption (batch size 1): {per_batch_gpu_memory_consumption_b1}")
+    complexity_stats_logger(f"Per batch GPU memory consumption (batch size 2): {per_batch_gpu_memory_consumption_b2}")
     complexity_stats_logger(f"Per batch GPU memory consumption (batch size 4): {per_batch_gpu_memory_consumption_b4}")
     complexity_stats_logger(f"Per batch GPU memory consumption (batch size 8): {per_batch_gpu_memory_consumption_b8}")
     complexity_stats_logger(f"Per batch GPU memory consumption (batch size 16): {per_batch_gpu_memory_consumption_b16}")
@@ -173,8 +196,8 @@ def train(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train Transformers on CIFAR-100")
     parser.add_argument("--model", type=str, choices=["vit", "deit", "swin", "resnet"], required=True, help="Model type")
-    parser.add_argument("--batch_size", type=int, default="256", help="Batch size")
-    parser.add_argument("--lr", type=float, default=0.0001, help="Learning rate")
+    parser.add_argument("--batch_size", type=int, default="64", help="Batch size")
+    parser.add_argument("--lr", type=float, default=0.0005, help="Learning rate")
     parser.add_argument("--epochs", type=int, default="50", help="Number of training epochs")
     parser.add_argument("--output_dir", type=str, default="./outputs", help="Directory to save checkpoints")
     parser.add_argument("--phase", type=str, default="2", help="1: Pretrain, 2: Finetune")
