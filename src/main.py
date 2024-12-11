@@ -29,11 +29,13 @@ def validation(model, loader, criterion, device):
 
     return running_loss / len(loader), 100. * correct / total
 
-def train_one_epoch(model, loader, optimizer, criterion, device):
+def train_one_epoch(model, loader, optimizer, criterion, device, batch_size):
+    len_loader = len(loader) if isinstance(loader, DataLoader) else get_ImageNet1K_len(batch_size)
+
     model.train()
     running_loss = 0.0
     correct, total = 0, 0
-    for inputs, targets in tqdm(loader, total=len(loader), desc="train"):
+    for inputs, targets in tqdm(loader, total=len_loader, desc="train"):
         inputs, targets = inputs.to(device), targets.to(device)
 
         optimizer.zero_grad()
@@ -71,23 +73,23 @@ def train(args):
     args.output_dir = os.path.join(args.output_dir,f"{args.model}_{args.phase}_{datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}")
     model_path = os.path.join(args.output_dir, f"model.pth")
     log_path = os.path.join(args.output_dir, f"train.log")
-    if not os.path.exists(args.output_dir):
-        os.mkdir(args.output_dir)
+    if not os.path.exists("./outputs"):os.mkdir("./outputs")
+    if not os.path.exists(args.output_dir):os.mkdir(args.output_dir)
     # create output directory ================================
 
     # initialize components ==================================
-    model = get_model(args.model, pretrained=args.phase=="2").to(args.device)
+    model = get_model(args.model, pretrained=args.phase=="2", num_classes=100 if args.phase == "2" else 1000).to(args.device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr) \
+    optimizer = optim.Adam(model.parameters(), betas=(0.9, 0.999), eps=1e-08) \
         if args.phase == "2" \
-        else optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1, betas=(0.9, 0.999))
+        else None#optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1, betas=(0.9, 0.999))
     lr_scheduler=LinearDecayLR(optimizer, int(args.epochs), int(int(args.epochs)*0.25))
     # initialize components ==================================
 
     # initialize dataloaders =================================
-    train_loader, test_loader = get_CIFAR_loaders(int(args.batch_size), int(args.batch_size)) \
+    train_loader, test_loader = get_CIFAR_loaders(int(args.batch_size), 8) \
         if args.phase == "2" \
-        else get_ImageNet1K_loaders(int(args.batch_size), int(args.batch_size))
+        else (get_ImageNet1K_loaders_train(int(args.batch_size)), get_ImageNet1K_loaders_test(int(args.batch_size)))
     # initialize dataloaders =================================
     
     # log training details ===================================
@@ -99,12 +101,16 @@ def train(args):
     train_metrics_logger("=========================================")
     # log training details ===================================
 
+    best_val_acc = 0
+    patience = 5
+    patience_counter = 0
+
     total_train_time = 0
     for epoch in range(int(args.epochs)):
         start_time = time.time()
         train_metrics_logger(f"\nEpoch [{epoch+1}/{args.epochs}]")
 
-        train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, criterion, device=args.device)
+        train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, criterion, device=args.device, batch_size = int(args.batch_size))
         total_train_time += time.time() - start_time
 
         val_loss, val_acc = validation(model, test_loader, criterion, device=args.device)
@@ -116,6 +122,19 @@ def train(args):
         # log training metrics ===============================
 
         lr_scheduler.step()
+
+        # Early stopping check
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            patience_counter = 0
+            # Save the best model
+            train_metrics_logger(f"New best model with Validation Accuracy: {best_val_acc:.2f}%")
+        else:
+            patience_counter += 1
+            train_metrics_logger(f"No improvement in Validation Accuracy for {patience_counter} epochs.")
+            if patience_counter >= patience:
+                train_metrics_logger("Early stopping triggered. Stopping training.")
+                break
 
     # measure complexity metrics =============================
     per_instance_inference_latency = measure_per_instance_inference_latency(model, args.device)
@@ -149,12 +168,13 @@ def train(args):
     # log complexity metrics =================================
 
     torch.save(model.state_dict(), model_path)
+    print("========================")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train Transformers on CIFAR-100")
     parser.add_argument("--model", type=str, choices=["vit", "deit", "swin", "resnet"], required=True, help="Model type")
-    parser.add_argument("--batch_size", type=int, default="128", help="Batch size")
-    parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
+    parser.add_argument("--batch_size", type=int, default="256", help="Batch size")
+    parser.add_argument("--lr", type=float, default=0.0001, help="Learning rate")
     parser.add_argument("--epochs", type=int, default="50", help="Number of training epochs")
     parser.add_argument("--output_dir", type=str, default="./outputs", help="Directory to save checkpoints")
     parser.add_argument("--phase", type=str, default="2", help="1: Pretrain, 2: Finetune")

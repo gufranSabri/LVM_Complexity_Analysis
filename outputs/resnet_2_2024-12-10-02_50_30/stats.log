@@ -1,0 +1,15 @@
+Model: resnet50
+Dataset size: 50000
+FLOPs per instance: 4109669376
+Average time per forward pass: 0.0007463957858093254
+Training time per epoch: 37.35561628818512
+Per instance inference latency: 51.589054107666016
+Per batch GPU memory consumption (batch size 4): 546
+Per batch GPU memory consumption (batch size 8): 542
+Per batch GPU memory consumption (batch size 16): 632
+Per batch GPU memory consumption (batch size 32): 743
+Per batch GPU memory consumption (batch size 64): 1062
+Per batch GPU memory consumption (batch size 128): 1736
+Per batch GPU memory consumption (batch size 256): 3083
+Validation Loss: 0.8532
+Validation Accuracy: 81.93%

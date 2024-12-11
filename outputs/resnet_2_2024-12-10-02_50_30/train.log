@@ -1,0 +1,96 @@
+Model: resnet, Phase: 2
+Batch Size: 64, Learning Rate: 0.0005, Epochs: 50
+Output Directory: ./outputs/resnet_2_2024-12-10-02:50:30
+Device: cuda
+=========================================
+
+Epoch [1/50]
+Train Loss: 1.3400 | Train Acc: 64.83%
+Valid Loss: 0.6916 | Valid Acc: 78.98%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 78.98%
+
+Epoch [2/50]
+Train Loss: 0.5263 | Train Acc: 83.49%
+Valid Loss: 0.5889 | Valid Acc: 82.32%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 82.32%
+
+Epoch [3/50]
+Train Loss: 0.3410 | Train Acc: 89.38%
+Valid Loss: 0.6140 | Valid Acc: 82.16%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 1 epochs.
+
+Epoch [4/50]
+Train Loss: 0.2405 | Train Acc: 92.22%
+Valid Loss: 0.6407 | Valid Acc: 82.55%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 82.55%
+
+Epoch [5/50]
+Train Loss: 0.1726 | Train Acc: 94.43%
+Valid Loss: 0.6598 | Valid Acc: 82.50%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 1 epochs.
+
+Epoch [6/50]
+Train Loss: 0.1425 | Train Acc: 95.25%
+Valid Loss: 0.6825 | Valid Acc: 82.51%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 2 epochs.
+
+Epoch [7/50]
+Train Loss: 0.1091 | Train Acc: 96.48%
+Valid Loss: 0.6999 | Valid Acc: 82.86%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 82.86%
+
+Epoch [8/50]
+Train Loss: 0.1046 | Train Acc: 96.59%
+Valid Loss: 0.7845 | Valid Acc: 81.47%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 1 epochs.
+
+Epoch [9/50]
+Train Loss: 0.0938 | Train Acc: 97.01%
+Valid Loss: 0.7447 | Valid Acc: 82.90%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 82.90%
+
+Epoch [10/50]
+Train Loss: 0.0758 | Train Acc: 97.51%
+Valid Loss: 0.7494 | Valid Acc: 82.97%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 82.97%
+
+Epoch [11/50]
+Train Loss: 0.0760 | Train Acc: 97.55%
+Valid Loss: 0.7776 | Valid Acc: 82.39%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 1 epochs.
+
+Epoch [12/50]
+Train Loss: 0.0664 | Train Acc: 97.87%
+Valid Loss: 0.8005 | Valid Acc: 82.16%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 2 epochs.
+
+Epoch [13/50]
+Train Loss: 0.0637 | Train Acc: 98.05%
+Valid Loss: 0.8475 | Valid Acc: 82.04%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 3 epochs.
+
+Epoch [14/50]
+Train Loss: 0.0604 | Train Acc: 98.05%
+Valid Loss: 0.8255 | Valid Acc: 82.10%
+Learning Rate: [0.0004868421052631579]
+No improvement in Validation Accuracy for 4 epochs.
+
+Epoch [15/50]
+Train Loss: 0.0527 | Train Acc: 98.29%
+Valid Loss: 0.8532 | Valid Acc: 81.93%
+Learning Rate: [0.0004736842105263158]
+No improvement in Validation Accuracy for 5 epochs.
+Early stopping triggered. Stopping training.

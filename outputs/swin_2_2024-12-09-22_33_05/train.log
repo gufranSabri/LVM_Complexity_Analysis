@@ -1,0 +1,72 @@
+Model: swin, Phase: 2
+Batch Size: 64, Learning Rate: 0.0005, Epochs: 50
+Output Directory: ./outputs/swin_2_2024-12-09-22:33:05
+Device: cuda
+=========================================
+
+Epoch [1/50]
+Train Loss: 1.3146 | Train Acc: 64.21%
+Valid Loss: 1.0759 | Valid Acc: 69.41%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 69.41%
+
+Epoch [2/50]
+Train Loss: 0.7620 | Train Acc: 77.54%
+Valid Loss: 0.7653 | Valid Acc: 77.40%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 77.40%
+
+Epoch [3/50]
+Train Loss: 0.6168 | Train Acc: 81.31%
+Valid Loss: 0.7879 | Valid Acc: 77.20%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 1 epochs.
+
+Epoch [4/50]
+Train Loss: 0.5389 | Train Acc: 83.52%
+Valid Loss: 0.8306 | Valid Acc: 76.80%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 2 epochs.
+
+Epoch [5/50]
+Train Loss: 0.4597 | Train Acc: 85.60%
+Valid Loss: 0.8273 | Valid Acc: 76.99%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 3 epochs.
+
+Epoch [6/50]
+Train Loss: 0.4072 | Train Acc: 87.13%
+Valid Loss: 0.7787 | Valid Acc: 79.23%
+Learning Rate: [0.0005]
+New best model with Validation Accuracy: 79.23%
+
+Epoch [7/50]
+Train Loss: 0.3570 | Train Acc: 88.82%
+Valid Loss: 0.8348 | Valid Acc: 77.77%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 1 epochs.
+
+Epoch [8/50]
+Train Loss: 0.3202 | Train Acc: 89.82%
+Valid Loss: 0.8717 | Valid Acc: 77.19%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 2 epochs.
+
+Epoch [9/50]
+Train Loss: 0.2978 | Train Acc: 90.39%
+Valid Loss: 0.8957 | Valid Acc: 77.25%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 3 epochs.
+
+Epoch [10/50]
+Train Loss: 0.2615 | Train Acc: 91.72%
+Valid Loss: 0.8984 | Valid Acc: 77.98%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 4 epochs.
+
+Epoch [11/50]
+Train Loss: 0.2487 | Train Acc: 92.08%
+Valid Loss: 0.8644 | Valid Acc: 78.59%
+Learning Rate: [0.0005]
+No improvement in Validation Accuracy for 5 epochs.
+Early stopping triggered. Stopping training.

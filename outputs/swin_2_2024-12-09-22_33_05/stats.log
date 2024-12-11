@@ -1,0 +1,15 @@
+Model: swin_base_patch4_window7_224
+Dataset size: 50000
+FLOPs per instance: 15466904576
+Average time per forward pass: 0.002490878372222109
+Training time per epoch: 124.66348077297211
+Per instance inference latency: 18.294912338256836
+Per batch GPU memory consumption (batch size 4): 1440
+Per batch GPU memory consumption (batch size 8): 1519
+Per batch GPU memory consumption (batch size 16): 1678
+Per batch GPU memory consumption (batch size 32): 2002
+Per batch GPU memory consumption (batch size 64): 2625
+Per batch GPU memory consumption (batch size 128): 3890
+Per batch GPU memory consumption (batch size 256): 6420
+Validation Loss: 0.8644
+Validation Accuracy: 78.59%
